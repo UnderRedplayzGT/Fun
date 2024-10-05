@@ -1,0 +1,44 @@
+-- Create Screen GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 200, 0, 50)  -- Button size
+button.Position = UDim2.new(0.5, -100, 0.5, -25)  -- Centered
+button.Text = "Toggle Fly"
+button.Parent = screenGui
+
+-- Create fly variables
+local flying = false
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+local speed = 50  -- Flying speed
+
+-- Fly function
+local function fly()
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = Vector3.new(0, speed, 0)  -- Initial lift-off
+    bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+    bodyVelocity.Parent = rootPart
+
+    local connection
+    connection = game:GetService("RunService").Heartbeat:Connect(function()
+        if not flying then
+            bodyVelocity:Destroy()  -- Stop flying when toggled off
+            connection:Disconnect()  -- Stop updating movement
+        else
+            -- Movement logic (adjust this to modify fly movement)
+            bodyVelocity.Velocity = rootPart.CFrame.lookVector * speed + Vector3.new(0, speed, 0)
+        end
+    end)
+end
+
+button.MouseButton1Click:Connect(function()
+    flying = not flying
+    if flying then
+        fly()
+    end
+end)
